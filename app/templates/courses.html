@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Available Courses</h1>
+<ul>
+    {% for course in courses %}
+    <li>{{ course.CourseName }} ({{ course.Credits }} credits)</li>
+    {% endfor %}
+</ul>
+{% endblock %}
