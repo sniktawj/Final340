@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Student Graduation Plan</h2>
+<p>Student Name: {{ student.Name }}</p>
+<p>Completed Courses:</p>
+<ul>
+    {% for course in student.CompletedCourses %}
+    <li>{{ course }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

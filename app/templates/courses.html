@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Available Courses</h1>
+<h2>Available Courses</h2>
 <ul>
     {% for course in courses %}
-    <li>{{ course.CourseName }} ({{ course.Credits }} credits)</li>
+    <li>{{ course.CourseName }} - {{ course.Credits }} credits</li>
     {% endfor %}
 </ul>
 {% endblock %}
