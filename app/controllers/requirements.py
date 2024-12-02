@@ -85,6 +85,7 @@ class RequirementController:
         """
 
     @cherrypy.expose
+    @cherrypy.expose
     def search(self, program=None):
         """Search and display the requirements for a given program."""
         if not program:
@@ -96,12 +97,23 @@ class RequirementController:
 
         try:
             cursor = connection.cursor(dictionary=True)
+            # Assuming there's a 'Majors' table to map program names to MajorID
+            major_query = "SELECT MajorID FROM Majors WHERE MajorName = %s"
+            cursor.execute(major_query, (program,))
+            major = cursor.fetchone()
+
+            if not major:
+                return f"<h2>No major found for program: {program}</h2>"
+
+            major_id = major['MajorID']
+            # Query the requirements table
             query = """
-                SELECT course_id, course_name, credit_hours 
-                FROM requirements 
-                WHERE program = %s
+                SELECT r.RequirementID, r.CourseID, r.RequirementType, c.CourseName, c.CreditHours
+                FROM requirements r
+                JOIN Courses c ON r.CourseID = c.CourseID
+                WHERE r.MajorID = %s
             """
-            cursor.execute(query, (program,))
+            cursor.execute(query, (major_id,))
             results = cursor.fetchall()
 
             if not results:
@@ -118,8 +130,10 @@ class RequirementController:
                     <table>
                         <thead>
                             <tr>
+                                <th>Requirement ID</th>
                                 <th>Course ID</th>
                                 <th>Course Name</th>
+                                <th>Requirement Type</th>
                                 <th>Credit Hours</th>
                             </tr>
                         </thead>
@@ -128,15 +142,17 @@ class RequirementController:
             for row in results:
                 html += f"""
                             <tr>
-                                <td>{row['course_id']}</td>
-                                <td>{row['course_name']}</td>
-                                <td>{row['credit_hours']}</td>
+                                <td>{row['RequirementID']}</td>
+                                <td>{row['CourseID']}</td>
+                                <td>{row['CourseName']}</td>
+                                <td>{row['RequirementType']}</td>
+                                <td>{row['CreditHours']}</td>
                             </tr>
                 """
             html += """
                         </tbody>
                     </table>
-                    <a href="/requirements">Search Again</a>
+                    <a href="/">Search Again</a>
                 </body>
             </html>
             """
